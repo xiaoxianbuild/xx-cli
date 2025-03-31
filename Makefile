@@ -1,14 +1,19 @@
+export GO_VERSION := $(shell go env GOVERSION)
+GO_RELEASER := $(shell go env GOBIN)/goreleaser
+export GOOS := $(shell go env GOOS)
+export GOARCH := $(shell go env GOARCH)
 .PHONY: build
 build:
-	@if [ "$(shell uname)" = "Darwin" ] && [ "$(shell uname -m)" = "arm64" ]; then \
+	@if [ "$(GOOS)" = "darwin" ] && [ "$(GOARCH)" = "arm64" ]; then \
 	   	echo "Building for macOS with Apple silicon (arm64) architecture..."; \
-	elif [ "$(shell uname)" = "Linux" ] && [ "$(shell uname -m)" = "x86_64" ]; then \
+	elif [ "$(GOOS)" = "linux" ] && [ "$(GOARCH)" = "amd64" ]; then \
         echo "Building for Linux with AMD64 architecture..."; \
 	else \
-		echo "This script is only for macOS with Apple silicon (arm64) architecture."; \
+	  	echo "Unsupported platform($(GOOS) $(GOARCH))."; \
 		exit 1; \
 	fi
-	go build -o build/xx ./main.go
+	$(GO_RELEASER) build --clean --snapshot --verbose --single-target
+	cp dist/xx-cli_$(GOOS)_$(GOARCH)_*/xx-cli build/xx
 	@echo "Build completed successfully.";
 
 .PHONY: clean
