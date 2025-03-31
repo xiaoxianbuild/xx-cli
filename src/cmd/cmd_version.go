@@ -15,12 +15,12 @@ GoVersion: %s
 }
 
 func newVersionCommand() *cobra.Command {
-	versionCmd := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "version",
 		Short:         "version of the CLI",
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		RunE:          versionFunc,
 	}
-	return versionCmd
+	return cmd
 }

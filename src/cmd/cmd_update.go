@@ -120,15 +120,15 @@ func updateFunc(cmd *cobra.Command, args []string) error {
 }
 
 func newUpdateCommand() *cobra.Command {
-	updateCmd := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:           "update",
 		Short:         "Update the CLI",
 		RunE:          updateFunc,
 		SilenceErrors: true,
 		SilenceUsage:  true,
 	}
-	updateCmd.Flags().Bool(updateFlagGithub, true, "Update from GitHub")
-	updateCmd.Flags().StringP(updateFlagCustom, "c", "", "Update from Custom URL")
-	updateCmd.Flags().StringP(updateFlagProxy, "p", "", "Proxy URL")
-	return updateCmd
+	cmd.Flags().Bool(updateFlagGithub, true, "Update from GitHub")
+	cmd.Flags().StringP(updateFlagCustom, "c", "", "Update from Custom URL")
+	cmd.Flags().StringP(updateFlagProxy, "p", "", "Proxy URL")
+	return cmd
 }

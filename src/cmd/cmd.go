@@ -23,6 +23,7 @@ func NewCLI() *cobra.Command {
 	}
 	rootCmd.AddCommand(
 		newUpdateCommand(),
+		newPrintCommand(),
 		newVersionCommand(),
 	)
 
