@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/xiaoxianbuild/xx-cli/src/constants"
 	"log"
 )
 
@@ -10,8 +11,9 @@ func NewCLI() *cobra.Command {
 	cobra.EnableCommandSorting = false
 
 	rootCmd := &cobra.Command{
-		Use:   CommandName,
-		Short: CommandShortDesc,
+		Use:     CommandName,
+		Short:   CommandShortDesc,
+		Version: constants.Version,
 		CompletionOptions: cobra.CompletionOptions{
 			DisableDefaultCmd: true,
 		},
@@ -21,6 +23,7 @@ func NewCLI() *cobra.Command {
 	}
 	rootCmd.AddCommand(
 		newUpdateCommand(),
+		newVersionCommand(),
 	)
 
 	return rootCmd

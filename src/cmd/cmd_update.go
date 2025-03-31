@@ -36,11 +36,11 @@ func getHttpClient(proxy string) (*http.Client, error) {
 
 func checkUpdateArgsAndFlags(cmd *cobra.Command, args []string) (string, *http.Client, error) {
 	if len(args) > 0 {
-		_ = cmd.Usage()
+		cmd.Print(cmd.UsageString())
 		return "", nil, errors.New("update command does not accept any arguments")
 	}
 	if cmd.Flags().Changed(updateFlagGithub) && cmd.Flags().Changed(updateFlagCustom) {
-		_ = cmd.Usage()
+		cmd.Print(cmd.UsageString())
 		return "", nil, errors.New("only one of --github or --custom can be specified")
 	}
 	githubFlag, _ := cmd.Flags().GetBool(updateFlagGithub)
