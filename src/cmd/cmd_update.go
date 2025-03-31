@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"errors"
+	"fmt"
 	"github.com/google/go-github/v70/github"
 	"github.com/minio/selfupdate"
 	"github.com/spf13/cobra"
@@ -10,6 +11,7 @@ import (
 	"github.com/xiaoxianbuild/xx-cli/src/utils/reflect_utils"
 	"net/http"
 	"net/url"
+	"runtime"
 )
 
 const updateFlagGithub = "github"
@@ -57,11 +59,15 @@ func checkUpdateArgsAndFlags(cmd *cobra.Command, args []string) (string, *http.C
 		if err != nil {
 			return "", nil, err
 		}
+		binaryName := fmt.Sprintf("%s_%s_%s", CommandName, runtime.GOOS, runtime.GOARCH)
 		githubReleaseUrl, err := github_utils.GetLatestReleaseBinary(
 			cmd.Context(),
 			github.NewClient(httpClient),
 			githubInfo.RepoOwner, githubInfo.RepoName,
-			nil,
+			func(asset *github.ReleaseAsset) bool {
+				name := asset.GetName()
+				return binaryName == name
+			},
 		)
 		if err != nil {
 			return "", nil, err
