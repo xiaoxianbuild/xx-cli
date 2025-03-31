@@ -5,7 +5,6 @@ import (
 	"errors"
 	"github.com/google/go-github/v70/github"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -44,13 +43,10 @@ func DownloadAsset(
 	assetId *int64,
 	httpClient *http.Client,
 ) (io.ReadCloser, error) {
-
-	resp, redirectUrl, err := client.Repositories.DownloadReleaseAsset(
+	resp, _, err := client.Repositories.DownloadReleaseAsset(
 		ctx, repoOwner, repoName,
 		*assetId,
 		httpClient,
 	)
-	log.Println(redirectUrl)
-
 	return resp, err
 }
