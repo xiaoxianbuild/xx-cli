@@ -19,6 +19,9 @@ func NewCLI() *cobra.Command {
 			cmd.Print(cmd.UsageString())
 		},
 	}
+	rootCmd.AddCommand(
+		newUpdateCommand(),
+	)
 
 	return rootCmd
 }
