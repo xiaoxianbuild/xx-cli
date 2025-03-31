@@ -1,7 +1,9 @@
 export GO_VERSION := $(shell go env GOVERSION)
-GO_RELEASER := $(shell go env GOBIN)/goreleaser
 export GOOS := $(shell go env GOOS)
 export GOARCH := $(shell go env GOARCH)
+GO_RELEASER := $(shell go env GOBIN)/goreleaser
+PROJECT_NAME := xx
+
 .PHONY: build
 build:
 	@if [ "$(GOOS)" = "darwin" ] && [ "$(GOARCH)" = "arm64" ]; then \
@@ -13,11 +15,11 @@ build:
 		exit 1; \
 	fi
 	$(GO_RELEASER) build --clean --snapshot --verbose --single-target
-	cp dist/xx-cli_$(GOOS)_$(GOARCH)_*/xx-cli build/xx
+	cp dist/$(PROJECT_NAME)_$(GOOS)_$(GOARCH)_*/$(PROJECT_NAME) build/$(PROJECT_NAME)
 	@echo "Build completed successfully.";
 
 .PHONY: clean
 clean:
 	@echo "Cleaning up build files..."
-	rm -rf build/xx
+	rm -rf build/$(PROJECT_NAME)
 	@echo "Cleaned up build files."

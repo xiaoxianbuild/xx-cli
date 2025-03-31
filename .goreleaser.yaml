@@ -8,6 +8,8 @@
 
 version: 2
 
+project_name: xx
+
 before:
   hooks:
     # You may remove this if you don't use go modules.
@@ -32,7 +34,7 @@ archives:
   - formats: [ binary ]
     # this name template makes the OS and Arch compatible with the results of `uname`.
     name_template: >-
-      xx_
+      {{ .ProjectName }}_
       {{- .Os }}_
       {{- .Arch }}
 
