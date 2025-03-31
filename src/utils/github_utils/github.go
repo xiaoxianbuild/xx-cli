@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"github.com/google/go-github/v70/github"
+	"io"
+	"log"
+	"net/http"
 )
 
 type AssetMatcher = func(*github.ReleaseAsset) bool
@@ -14,20 +17,40 @@ func GetLatestReleaseBinary(
 	ctx context.Context,
 	client *github.Client,
 	repoOwner, repoName string,
-	assetMatcher AssetMatcher) (string, error) {
+	assetMatcher AssetMatcher) (*int64, error) {
 	release, _, err := client.Repositories.GetLatestRelease(ctx, repoOwner, repoName)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	var assetURL string
 	if assetMatcher != nil {
 		for _, asset := range release.Assets {
 			if assetMatcher(asset) {
-				assetURL = asset.GetBrowserDownloadURL()
-				return assetURL, nil
+				return asset.ID, nil
 			}
 		}
 	}
-	return "", ErrBinaryNotFound
+	return nil, ErrBinaryNotFound
+}
+
+// DownloadAsset downloads a release asset or returns a redirect URL.
+//
+// DownloadReleaseAsset returns an io.ReadCloser that reads the contents of the
+// specified release asset. It is the caller's responsibility to close the ReadCloser.
+func DownloadAsset(
+	ctx context.Context,
+	client *github.Client,
+	repoOwner, repoName string,
+	assetId *int64,
+	httpClient *http.Client,
+) (io.ReadCloser, error) {
+
+	resp, redirectUrl, err := client.Repositories.DownloadReleaseAsset(
+		ctx, repoOwner, repoName,
+		*assetId,
+		httpClient,
+	)
+	log.Println(redirectUrl)
+
+	return resp, err
 }
