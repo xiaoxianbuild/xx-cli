@@ -28,9 +28,9 @@ func printEnvFunc(cmd *cobra.Command, args []string) error {
 			cmd.Printf("\n")
 		}
 		if raw {
-			cmd.Printf("%s\n", system_utils.GetEnv(name, nil))
+			cmd.Printf("%s\n", system_utils.GetEnvPrintString(name, nil))
 		} else {
-			cmd.Printf("%s\n", system_utils.GetEnv(name, &system_utils.EnvironmentSeparator))
+			cmd.Printf("%s\n", system_utils.GetEnvPrintString(name, &system_utils.EnvironmentSeparator))
 		}
 	}
 	return nil
