@@ -23,3 +23,22 @@ clean:
 	@echo "Cleaning up build files..."
 	rm -rf build/$(PROJECT_NAME)
 	@echo "Cleaned up build files."
+
+.PHONY: ubuntu
+ubuntu:
+	GOOS=linux GOARCH=amd64 SYSTEM=ubuntu DOCKER_VERSION=24.04 DIST_VERSION=v1 make single_build
+
+.PHONY: ubuntu-arm
+ubuntu-arm:
+	GOOS=linux GOARCH=arm64 SYSTEM=ubuntu DOCKER_VERSION=noble DIST_VERSION=v8.0 make single_build
+
+.PHONY: single_build
+single_build:
+	@echo "Building $(SYSTEM) $(GOARCH) xiaoxian tool"
+	$(GO_RELEASER) build --clean --snapshot --single-target
+	@echo "run $(SYSTEM) $(GOARCH)..."
+	@docker run --rm -it \
+		--platform $(GOOS)/$(GOARCH) \
+		-v $(shell pwd)/dist/$(PROJECT_NAME)_$(GOOS)_$(GOARCH)_$(DIST_VERSION)/$(PROJECT_NAME):/usr/local/bin/$(PROJECT_NAME) \
+		--name $(PROJECT_NAME)_$(SYSTEM)_$(GOARCH) \
+		$(SYSTEM):$(DOCKER_VERSION)
