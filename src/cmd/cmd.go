@@ -27,6 +27,7 @@ func NewCLI() *cobra.Command {
 		newDoctorCommand(),
 		newPrintCommand(),
 		newVersionCommand(),
+		newInstallCommand(),
 	)
 
 	return rootCmd
