@@ -12,24 +12,32 @@ type AssetMatcher = func(*github.ReleaseAsset) bool
 
 var ErrBinaryNotFound = errors.New("could not find binary in the latest release")
 
+func GetVersionFromRelease(release *github.RepositoryRelease) string {
+	if release != nil && release.TagName != nil {
+		return *release.TagName
+	}
+	return ""
+}
+
 func GetLatestReleaseBinary(
 	ctx context.Context,
 	client *github.Client,
 	repoOwner, repoName string,
-	assetMatcher AssetMatcher) (*int64, error) {
+	assetMatcher AssetMatcher) (*int64, string, error) {
 	release, _, err := client.Repositories.GetLatestRelease(ctx, repoOwner, repoName)
+	version := GetVersionFromRelease(release)
 	if err != nil {
-		return nil, err
+		return nil, version, err
 	}
 
 	if assetMatcher != nil {
 		for _, asset := range release.Assets {
 			if assetMatcher(asset) {
-				return asset.ID, nil
+				return asset.ID, version, nil
 			}
 		}
 	}
-	return nil, ErrBinaryNotFound
+	return nil, version, ErrBinaryNotFound
 }
 
 // DownloadAsset downloads a release asset or returns a redirect URL.

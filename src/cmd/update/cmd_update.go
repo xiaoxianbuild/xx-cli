@@ -1,4 +1,4 @@
-package cmd
+package update
 
 import (
 	"context"
@@ -7,10 +7,13 @@ import (
 	"github.com/google/go-github/v70/github"
 	"github.com/minio/selfupdate"
 	"github.com/spf13/cobra"
+	"github.com/xiaoxianbuild/xx-cli/src/constants"
 	"github.com/xiaoxianbuild/xx-cli/src/utils"
 	"github.com/xiaoxianbuild/xx-cli/src/utils/github_utils"
 	"github.com/xiaoxianbuild/xx-cli/src/utils/reflect_utils"
+	"github.com/xiaoxianbuild/xx-cli/src/utils/version_utils"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 	"runtime"
@@ -70,9 +73,9 @@ func fetchReleaseBinary(
 		if err != nil {
 			return nil, err
 		}
-		binaryName := fmt.Sprintf("%s_%s_%s", CommandName, runtime.GOOS, runtime.GOARCH)
+		binaryName := fmt.Sprintf("%s_%s_%s", constants.CommandName, runtime.GOOS, runtime.GOARCH)
 		githubClient := github.NewClient(httpClient)
-		githubAssetId, err := github_utils.GetLatestReleaseBinary(
+		githubAssetId, version, err := github_utils.GetLatestReleaseBinary(
 			ctx,
 			githubClient,
 			githubInfo.RepoOwner, githubInfo.RepoName,
@@ -83,6 +86,15 @@ func fetchReleaseBinary(
 		)
 		if err != nil {
 			return nil, err
+		}
+		log.Println("current version:", constants.Version)
+		log.Println("latest version:", version)
+		compare, err := version_utils.Compare(version, constants.Version)
+		if err != nil {
+			return nil, err
+		}
+		if compare <= 0 {
+			return nil, errors.New("already up to date")
 		}
 		return github_utils.DownloadAsset(
 			ctx,
@@ -119,7 +131,7 @@ func updateFunc(cmd *cobra.Command, args []string) error {
 	return err
 }
 
-func newUpdateCommand() *cobra.Command {
+func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "update",
 		Short:         "Update the CLI",

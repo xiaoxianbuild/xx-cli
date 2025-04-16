@@ -10,7 +10,7 @@ import (
 
 func TestGetLatestReleaseBinary(t *testing.T) {
 	client := github.NewClient(nil)
-	got, err := GetLatestReleaseBinary(context.Background(), client,
+	got, _, err := GetLatestReleaseBinary(context.Background(), client,
 		"google", "go-github",
 		nil,
 	)
@@ -18,7 +18,7 @@ func TestGetLatestReleaseBinary(t *testing.T) {
 	assert.EqualError(t, err, ErrBinaryNotFound.Error())
 	assert.Nil(t, got)
 
-	got, err = GetLatestReleaseBinary(context.Background(), client,
+	got, _, err = GetLatestReleaseBinary(context.Background(), client,
 		"asdf-vm", "asdf",
 		func(asset *github.ReleaseAsset) bool {
 			name := asset.GetName()
@@ -31,7 +31,7 @@ func TestGetLatestReleaseBinary(t *testing.T) {
 
 func TestDownloadAssets(t *testing.T) {
 	client := github.NewClient(nil)
-	got, err := GetLatestReleaseBinary(context.Background(), client,
+	got, _, err := GetLatestReleaseBinary(context.Background(), client,
 		"google", "go-github",
 		nil,
 	)
@@ -39,7 +39,7 @@ func TestDownloadAssets(t *testing.T) {
 	assert.EqualError(t, err, ErrBinaryNotFound.Error())
 	assert.Empty(t, got)
 
-	got, err = GetLatestReleaseBinary(context.Background(), client,
+	got, _, err = GetLatestReleaseBinary(context.Background(), client,
 		"asdf-vm", "asdf",
 		func(asset *github.ReleaseAsset) bool {
 			name := asset.GetName()
