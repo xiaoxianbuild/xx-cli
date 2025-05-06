@@ -1,4 +1,4 @@
-package cmd
+package doctor
 
 import (
 	"errors"
@@ -16,7 +16,7 @@ func doctorFunc(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func newDoctorCommand() *cobra.Command {
+func NewCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:           "doctor",
 		Short:         "doctor check xiaoxian cli environment",
