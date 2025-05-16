@@ -3,11 +3,18 @@ package system_utils
 import (
 	"github.com/xiaoxianbuild/xx-cli/src/utils"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 )
 
 var EnvironmentSeparator = ':'
+
+// CheckExecutableInPath checks if a exe file exists in the PATH
+func CheckExecutableInPath(exe string) bool {
+	_, err := exec.LookPath(exe)
+	return err == nil
+}
 
 func GetEnvPrintString(key string, separate *rune) string {
 	envVar := os.Getenv(key)
@@ -43,6 +50,12 @@ func XDGStateHome() string {
 		"XDG_STATE_HOME",
 		path.Join(Home(), ".local", "state"),
 	)
+}
+
+// XDGBinHome returns the path to the user's local bin directory
+// according to the XDG Base Directory Specification
+func XDGBinHome() string {
+	return path.Join(Home(), ".local", "bin")
 }
 
 func XDGConfigHome() string {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/doctor"
+	"github.com/xiaoxianbuild/xx-cli/src/cmd/install"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/jq"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/update"
 	"github.com/xiaoxianbuild/xx-cli/src/constants"
@@ -31,6 +32,7 @@ func NewCLI() *cobra.Command {
 		newPrintCommand(),
 		newVersionCommand(),
 		jq.NewCommand(),
+		install.NewCommand(),
 	)
 
 	return rootCmd
