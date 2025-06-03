@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/google/go-github/v70/github"
+	"github.com/google/go-github/v72/github"
 	"github.com/minio/selfupdate"
 	"github.com/spf13/cobra"
 	"github.com/xiaoxianbuild/xx-cli/src/constants"

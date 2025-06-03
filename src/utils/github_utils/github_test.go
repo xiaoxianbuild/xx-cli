@@ -2,7 +2,7 @@ package github_utils
 
 import (
 	"context"
-	"github.com/google/go-github/v70/github"
+	"github.com/google/go-github/v72/github"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"

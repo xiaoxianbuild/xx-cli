@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"fmt"
-	"github.com/google/go-github/v70/github"
+	"github.com/google/go-github/v72/github"
 	"github.com/xiaoxianbuild/xx-cli/src/types"
 	"github.com/xiaoxianbuild/xx-cli/src/utils"
 	"github.com/xiaoxianbuild/xx-cli/src/utils/github_utils"

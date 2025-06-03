@@ -4,7 +4,7 @@ go 1.24.1
 
 require (
 	github.com/Masterminds/semver/v3 v3.3.1
-	github.com/google/go-github/v70 v70.0.0
+	github.com/google/go-github/v72 v72.0.0
 	github.com/itchyny/gojq v0.12.17
 	github.com/mattn/go-isatty v0.0.20
 	github.com/mattn/go-runewidth v0.0.16
