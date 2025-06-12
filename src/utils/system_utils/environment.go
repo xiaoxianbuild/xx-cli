@@ -10,7 +10,7 @@ import (
 
 var EnvironmentSeparator = ':'
 
-// CheckExecutableInPath checks if a exe file exists in the PATH
+// CheckExecutableInPath checks if an exe file exists in the PATH
 func CheckExecutableInPath(exe string) bool {
 	_, err := exec.LookPath(exe)
 	return err == nil

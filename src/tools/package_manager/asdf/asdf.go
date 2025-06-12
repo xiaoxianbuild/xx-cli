@@ -235,3 +235,30 @@ func Upgrade(logger types.Logger) error {
 	logger.Printf("asdf has been upgraded to version %s\n", version)
 	return nil
 }
+
+// Remove removes the asdf version manager
+func Remove(logger types.Logger) error {
+	// Check if asdf is already in PATH
+	if !system_utils.CheckExecutableInPath(BinaryName) {
+		logger.Println("asdf is not installed. Nothing to remove.")
+		return nil
+	}
+
+	logger.Println("Removing asdf...")
+
+	// Get the path to the current asdf binary
+	whichCmd := exec.Command("which", BinaryName)
+	whichOutput, err := whichCmd.Output()
+	if err != nil {
+		return fmt.Errorf("failed to locate current asdf binary: %v", err)
+	}
+	currentBinPath := strings.TrimSpace(string(whichOutput))
+
+	// Remove the binary
+	if err := os.Remove(currentBinPath); err != nil {
+		return fmt.Errorf("failed to remove asdf binary: %v", err)
+	}
+
+	logger.Println("asdf has been removed successfully")
+	return nil
+}
