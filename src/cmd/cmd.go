@@ -6,6 +6,7 @@ import (
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/install"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/jq"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/update"
+	"github.com/xiaoxianbuild/xx-cli/src/cmd/upgrade"
 	"github.com/xiaoxianbuild/xx-cli/src/constants"
 	"log"
 )
@@ -33,6 +34,7 @@ func NewCLI() *cobra.Command {
 		newVersionCommand(),
 		jq.NewCommand(),
 		install.NewCommand(),
+		upgrade.NewCommand(),
 	)
 
 	return rootCmd
