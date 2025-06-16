@@ -5,7 +5,7 @@ import (
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/doctor"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/install"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/jq"
-	"github.com/xiaoxianbuild/xx-cli/src/cmd/remove"
+	"github.com/xiaoxianbuild/xx-cli/src/cmd/uninstall"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/update"
 	"github.com/xiaoxianbuild/xx-cli/src/cmd/upgrade"
 	"github.com/xiaoxianbuild/xx-cli/src/constants"
@@ -36,7 +36,7 @@ func NewCLI() *cobra.Command {
 		jq.NewCommand(),
 		install.NewCommand(),
 		upgrade.NewCommand(),
-		remove.NewCommand(),
+		uninstall.NewCommand(),
 	)
 
 	return rootCmd

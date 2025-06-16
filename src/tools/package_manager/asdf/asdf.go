@@ -3,6 +3,7 @@ package asdf
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"github.com/google/go-github/v72/github"
 	"github.com/xiaoxianbuild/xx-cli/src/types"
@@ -115,14 +116,28 @@ func downloadAndExtractAsdf(
 	return tempDir, asdfBinaryPath, nil
 }
 
-// Install installs the asdf version manager
-func Install(logger types.Logger) error {
-	// Check if asdf is already in PATH
-	if system_utils.CheckExecutableInPath(BinaryName) {
-		logger.Println("asdf is already installed and available in PATH")
-		return nil
-	}
+type Asdf struct{}
 
+func New() *Asdf {
+	return &Asdf{}
+}
+
+func (Asdf) Check() (bool, error) {
+	// Check if asdf is already in PATH
+	exist := system_utils.CheckExecutableInPath(BinaryName)
+	return exist, nil
+}
+
+// Install installs the asdf version manager
+func (m Asdf) Install(logger types.Logger) error {
+	// Check if asdf is already in PATH
+	exist, err := m.Check()
+	if exist {
+		return errors.New("asdf is already installed and available in PATH")
+	}
+	if err != nil {
+		return err
+	}
 	logger.Println("asdf not found in PATH, downloading latest release...")
 
 	// Create a GitHub client
@@ -172,13 +187,15 @@ func Install(logger types.Logger) error {
 }
 
 // Upgrade upgrades the asdf version manager to the latest version
-func Upgrade(logger types.Logger) error {
+func (m Asdf) Upgrade(logger types.Logger) error {
 	// Check if asdf is already in PATH
-	if !system_utils.CheckExecutableInPath(BinaryName) {
-		logger.Println("asdf is not installed. Please install it first using 'xx install asdf'")
-		return fmt.Errorf("asdf not found in PATH")
+	exists, err := m.Check()
+	if !exists {
+		return fmt.Errorf("asdf is not installed. Please install it first using 'xx install asdf'")
 	}
-
+	if err != nil {
+		return err
+	}
 	logger.Println("Upgrading asdf to the latest version...")
 
 	// Create a GitHub client
@@ -236,14 +253,16 @@ func Upgrade(logger types.Logger) error {
 	return nil
 }
 
-// Remove removes the asdf version manager
-func Remove(logger types.Logger) error {
+// Uninstall uninstalls the asdf version manager
+func (m Asdf) Uninstall(logger types.Logger) error {
 	// Check if asdf is already in PATH
-	if !system_utils.CheckExecutableInPath(BinaryName) {
-		logger.Println("asdf is not installed. Nothing to remove.")
-		return nil
+	exists, err := m.Check()
+	if !exists {
+		return fmt.Errorf("asdf is not installed. Cannot uninstall")
 	}
-
+	if err != nil {
+		return err
+	}
 	logger.Println("Removing asdf...")
 
 	// Get the path to the current asdf binary
@@ -256,9 +275,9 @@ func Remove(logger types.Logger) error {
 
 	// Remove the binary
 	if err := os.Remove(currentBinPath); err != nil {
-		return fmt.Errorf("failed to remove asdf binary: %v", err)
+		return fmt.Errorf("failed to uninstall asdf binary: %v", err)
 	}
 
-	logger.Println("asdf has been removed successfully")
+	logger.Println("asdf has been uninstalled successfully")
 	return nil
 }

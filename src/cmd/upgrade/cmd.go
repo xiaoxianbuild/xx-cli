@@ -3,7 +3,7 @@ package upgrade
 import (
 	"errors"
 	"github.com/spf13/cobra"
-	"github.com/xiaoxianbuild/xx-cli/src/tools/package_manager/asdf"
+	"github.com/xiaoxianbuild/xx-cli/src/tools/package_manager"
 )
 
 func upgradeFunc(cmd *cobra.Command, args []string) error {
@@ -12,14 +12,7 @@ func upgradeFunc(cmd *cobra.Command, args []string) error {
 		return errors.New("upgrade command should have at least one argument")
 	}
 
-	// Handle different upgrade subcommands
-	switch args[0] {
-	case asdf.BinaryName:
-		return asdf.Upgrade(cmd)
-	default:
-		cmd.Println("upgrade called, upgrade packages:", args)
-		return nil
-	}
+	return package_manager.Upgrade(cmd, args[0])
 }
 
 func NewCommand() *cobra.Command {
