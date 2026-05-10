@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { uninstall } from '../tools/package_manager/manager';
+import { uninstall } from '../tools/package-manager/manager';
 
 export function createUninstallCommand() {
   return new Command('uninstall')

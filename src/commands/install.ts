@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { install, upgrade } from '../tools/package_manager/manager';
+import { install, upgrade } from '../tools/package-manager/manager';
 
 export function createInstallCommand() {
   return new Command('install')

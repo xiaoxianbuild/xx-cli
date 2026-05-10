@@ -8,7 +8,7 @@ export interface PackageManager {
   uninstallPackage(packageName: string): Promise<void>;
 }
 
-export interface PackageProcessor {
+export interface BinaryPackageProcessor {
   name: string;
   check(): Promise<boolean>;
   install(): Promise<void>;

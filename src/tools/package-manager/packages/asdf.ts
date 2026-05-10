@@ -1,4 +1,4 @@
-import type { PackageProcessor } from '../types';
+import type { BinaryPackageProcessor } from '../types';
 import { getLatestRelease, downloadAsset } from '../../../utils/github';
 import { checkExecutableInPath, getBinHome, mustMkdir } from '../../../utils/system';
 import { spawnSync } from 'node:child_process';
@@ -6,7 +6,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
 
-export class AsdfProcessor implements PackageProcessor {
+export class AsdfProcessor implements BinaryPackageProcessor {
   name = 'asdf';
   private owner = 'asdf-vm';
   private repo = 'asdf';
