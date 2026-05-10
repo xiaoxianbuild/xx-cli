@@ -1,8 +1,8 @@
-import path from "path";
-import yaml from "js-yaml";
-import { getXDGConfigHome, mustMkdir, hasFile, writeFile, readFile } from "./utils/system";
+import path from 'node:path';
+import yaml from 'js-yaml';
+import { getXDGConfigHome, mustMkdir, hasFile, writeFile, readFile } from './utils/system';
 
-export const ConfigFile = path.join(getXDGConfigHome(), "xiaoxian.yaml");
+export const ConfigFile = path.join(getXDGConfigHome(), 'xiaoxian.yaml');
 
 const SampleConfig = `version: 0.0.1
 `;

@@ -41,14 +41,19 @@ jobs:
       - name: Install dependencies
         run: bun install
 
+      - name: Set Build Time
+        run: echo "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> $GITHUB_ENV
+
       - name: Build Binary
         run: |
           mkdir -p dist
-          bun build src/index.ts --compile --target ${{ matrix.target }} --outfile dist/xx_${{ matrix.os }}_${{ matrix.arch }}
+          bun scripts/compile.ts
         env:
+          TARGET: ${{ matrix.target }}
+          OUTFILE: dist/xx_${{ matrix.os }}_${{ matrix.arch }}
           VERSION: ${{ github.ref_name }}
-          BUILD_TIME: ${{ github.event.head_commit.timestamp || 'unknown' }}
           COMMIT: ${{ github.sha }}
+          # BUILD_TIME is picked up from GITHUB_ENV
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7

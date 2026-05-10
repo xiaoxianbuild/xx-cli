@@ -1,6 +1,6 @@
-import os from "os";
-import path from "path";
-import fs from "fs";
+import os from 'node:os';
+import path from 'node:path';
+import fs from 'node:fs';
 
 export function getHome() {
   return os.homedir();
@@ -11,17 +11,11 @@ export function getEnvWithDefault(key: string, defaultValue: string): string {
 }
 
 export function getXDGConfigHome() {
-  return getEnvWithDefault(
-    "XDG_CONFIG_HOME",
-    path.join(getHome(), ".config")
-  );
+  return getEnvWithDefault('XDG_CONFIG_HOME', path.join(getHome(), '.config'));
 }
 
 export function getXDGDataHome() {
-  return getEnvWithDefault(
-    "XDG_DATA_HOME",
-    path.join(getHome(), ".local", "share")
-  );
+  return getEnvWithDefault('XDG_DATA_HOME', path.join(getHome(), '.local', 'share'));
 }
 
 export function mustMkdir(dir: string) {
@@ -39,5 +33,5 @@ export function writeFile(file: string, content: string) {
 }
 
 export function readFile(file: string): string {
-  return fs.readFileSync(file, "utf-8");
+  return fs.readFileSync(file, 'utf-8');
 }
