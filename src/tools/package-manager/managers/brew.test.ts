@@ -49,8 +49,8 @@ describe('BrewPackageManager', () => {
   it(
     'installPackage should call brew install and succeeds',
     async () => {
-      expect(await manager.installPackage(simplePackage)).not.toThrow();
-      expect(await manager.uninstallPackage(simplePackage)).not.toThrow();
+      await manager.installPackage(simplePackage);
+      await manager.uninstallPackage(simplePackage);
     },
     {
       timeout: 10000,
