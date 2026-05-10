@@ -1,55 +1,42 @@
-import { spawnSync } from 'node:child_process';
-import fs from 'node:fs';
-import path from 'node:path';
-
 /**
- * 这个脚本用于执行真正的编译工作。
- * 它会读取环境变量，构造 bun build 命令并执行。
+ * 这个脚本使用 Bun.build API 进行打包，并注入编译期常量。
+ * 然后再调用 bun build --compile 将产物转换为二进制。
  */
 
-const VERSION = process.env.VERSION || '0.0.1';
-const COMMIT = process.env.COMMIT || 'local';
+// 1. 获取版本、时间、提交等信息
+const BUILD_VERSION = process.env.VERSION || '0.0.1-dev';
+const GIT_COMMIT = process.env.COMMIT || 'no-commit';
 const BUILD_TIME = process.env.BUILD_TIME || new Date().toISOString();
-const TARGET = process.env.TARGET || ''; // e.g. bun-linux-x64
+const TARGET = process.env.TARGET || `bun-${process.platform}-${process.arch}`; // e.g. bun-linux-x64
 const OUTFILE = process.env.OUTFILE || 'dist/xx';
 
 console.log('Compiling with settings:');
-console.log(`- Version: ${VERSION}`);
-console.log(`- Commit: ${COMMIT}`);
+console.log(`- Version: ${BUILD_VERSION}`);
+console.log(`- Commit: ${GIT_COMMIT}`);
 console.log(`- BuildTime: ${BUILD_TIME}`);
 console.log(`- Target: ${TARGET || 'native'}`);
 console.log(`- Outfile: ${OUTFILE}`);
 
-const outDir = path.dirname(OUTFILE);
-if (!fs.existsSync(outDir)) {
-  fs.mkdirSync(outDir, { recursive: true });
-}
+// 2. 执行打包
+const result = await Bun.build({
+  entrypoints: ['./src/index.ts'],
+  compile: {
+    target: TARGET as Bun.Build.CompileTarget | undefined,
+    outfile: OUTFILE,
+  },
+  define: {
+    BUILD_VERSION: JSON.stringify(BUILD_VERSION),
+    BUILD_TIME: JSON.stringify(BUILD_TIME),
+    GIT_COMMIT: JSON.stringify(GIT_COMMIT),
+  },
+});
 
-const args = [
-  'build',
-  'src/index.ts',
-  '--compile',
-  '--target=bun', // 基础目标是 bun
-  '--define',
-  `process.env.VERSION='${VERSION}'`,
-  '--define',
-  `process.env.BUILD_TIME='${BUILD_TIME}'`,
-  '--define',
-  `process.env.COMMIT='${COMMIT}'`,
-  '--outfile',
-  OUTFILE,
-];
-
-// 如果指定了特定 target (如 bun-linux-arm64)
-if (TARGET) {
-  args.push('--target', TARGET);
-}
-
-const result = spawnSync('bun', args, { stdio: 'inherit' });
-
-if (result.status !== 0) {
+if (!result.success) {
   console.error('Compilation failed');
-  process.exit(result.status || 1);
+  for (const message of result.logs) {
+    console.error(message);
+  }
+  process.exit(1);
 }
 
 console.log(`Compilation successful: ${OUTFILE}`);
