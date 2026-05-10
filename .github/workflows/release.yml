@@ -1,0 +1,81 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - target: bun-linux-x64
+            os: linux
+            arch: amd64
+            runner: ubuntu-latest
+          - target: bun-linux-arm64
+            os: linux
+            arch: arm64
+            runner: ubuntu-latest
+          - target: bun-darwin-x64
+            os: darwin
+            arch: amd64
+            runner: macos-latest
+          - target: bun-darwin-arm64
+            os: darwin
+            arch: arm64
+            runner: macos-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build Binary
+        run: |
+          mkdir -p dist
+          bun build src/index.ts --compile --target ${{ matrix.target }} --outfile dist/xx_${{ matrix.os }}_${{ matrix.arch }}
+        env:
+          VERSION: ${{ github.ref_name }}
+          BUILD_TIME: ${{ github.event.head_commit.timestamp || 'unknown' }}
+          COMMIT: ${{ github.sha }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: xx_${{ matrix.os }}_${{ matrix.arch }}
+          path: dist/xx_${{ matrix.os }}_${{ matrix.arch }}
+
+  create-release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts directory
+        run: |
+          mkdir -p dist
+          find artifacts -type f -exec mv {} dist/ \;
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v3
+        with:
+          files: dist/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

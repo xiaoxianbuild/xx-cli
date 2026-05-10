@@ -1,4 +1,5 @@
-/build
-xiaoxian.yaml
-# Added by goreleaser init:
-dist/
+node_modules
+dist
+.idea
+.DS_Store
+bun.lockb

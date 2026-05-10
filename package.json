@@ -1,0 +1,23 @@
+{
+  "name": "xx-cli",
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun src/index.ts",
+    "build": "bun build src/index.ts --outfile dist/xx",
+    "compile": "bun build src/index.ts --compile --outfile dist/xx",
+    "clean": "rm -rf dist"
+  },
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "commander": "^14.0.3",
+    "js-yaml": "^4.1.1"
+  }
+}
