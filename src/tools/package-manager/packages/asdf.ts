@@ -121,11 +121,15 @@ export class AsdfProcessor implements BinaryPackageProcessor {
     }
 
     console.log('Removing asdf...');
-    const whichResult = spawnSync('which', ['asdf'], { encoding: 'utf8' });
-    if (whichResult.status === 0) {
-      const binPath = whichResult.stdout.trim();
-      fs.unlinkSync(binPath);
-      console.log('asdf has been uninstalled successfully');
+    const binPath = Bun.which(this.name);
+    if (!binPath) {
+      throw new Error('asdf not found in PATH');
     }
+    if (!binPath.startsWith(getBinHome())) {
+      throw new Error(`asdf is not installed in the expected location(${binPath}), skip uninstalling for safety.`);
+    }
+    console.log(`asdf found in PATH(${binPath}), removing...`);
+    fs.unlinkSync(binPath);
+    console.log('asdf has been uninstalled successfully');
   }
 }
