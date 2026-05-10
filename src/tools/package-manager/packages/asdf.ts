@@ -1,3 +1,4 @@
+import { $ } from 'bun';
 import type { BinaryPackageProcessor } from '../types';
 import { getLatestRelease, downloadAsset } from '../../../utils/github';
 import { checkExecutableInPath, getBinHome, mustMkdir } from '../../../utils/system';
@@ -41,7 +42,7 @@ export class AsdfProcessor implements BinaryPackageProcessor {
       fs.writeFileSync(tarPath, Buffer.from(buffer));
 
       console.log('Extracting asdf...');
-      await Bun.$`tar -xzf ${tarPath} -C ${tempDir}`.quiet();
+      await $`tar -xzf ${tarPath} -C ${tempDir}`.quiet();
 
       const binHome = getBinHome();
       mustMkdir(binHome);
@@ -67,7 +68,7 @@ export class AsdfProcessor implements BinaryPackageProcessor {
     console.log('Upgrading asdf to the latest version...');
     const release = await getLatestRelease(this.owner, this.repo);
 
-    const currentVersion = await Bun.$`asdf --version`.text();
+    const currentVersion = await $`asdf --version`.text();
     if (currentVersion) {
       console.log(`Current asdf version: ${currentVersion.trim()}`);
       if (currentVersion.includes(release.tag_name.replace('v', ''))) {
@@ -95,7 +96,7 @@ export class AsdfProcessor implements BinaryPackageProcessor {
       fs.writeFileSync(tarPath, Buffer.from(buffer));
 
       console.log('Extracting asdf...');
-      await Bun.$`tar -xzf ${tarPath} -C ${tempDir}`.quiet();
+      await $`tar -xzf ${tarPath} -C ${tempDir}`.quiet();
 
       const currentBinPath = Bun.which('asdf');
       if (!currentBinPath) {

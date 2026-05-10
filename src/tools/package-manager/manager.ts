@@ -8,7 +8,7 @@ const managers: PackageManager[] = [new BinaryPackageManager([new AsdfProcessor(
 
 export async function install(packageName: string): Promise<void> {
   for (const manager of managers) {
-    if (!manager.supportsPackage(packageName)) {
+    if (!(await manager.supportsPackage(packageName))) {
       continue;
     }
     // 如果已经安装了，直接返回成功
@@ -28,7 +28,7 @@ export async function install(packageName: string): Promise<void> {
 
 export async function upgrade(packageName: string): Promise<void> {
   for (const manager of managers) {
-    if (!manager.supportsPackage(packageName)) {
+    if (!(await manager.supportsPackage(packageName))) {
       continue;
     }
     try {
@@ -43,7 +43,7 @@ export async function upgrade(packageName: string): Promise<void> {
 
 export async function uninstall(packageName: string): Promise<void> {
   for (const manager of managers) {
-    if (!manager.supportsPackage(packageName)) {
+    if (!(await manager.supportsPackage(packageName))) {
       continue;
     }
     try {

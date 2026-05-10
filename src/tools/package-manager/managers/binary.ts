@@ -19,7 +19,7 @@ export class BinaryPackageManager implements PackageManager {
     return processor ? await processor.check() : false;
   }
 
-  supportsPackage(packageName: string): boolean {
+  async supportsPackage(packageName: string): Promise<boolean> {
     return this.processors.has(packageName);
   }
 

@@ -1,3 +1,4 @@
+import { $ } from 'bun';
 import type { PackageManager } from '../types';
 import { checkExecutableInPath } from '../../../utils/system';
 
@@ -12,14 +13,17 @@ export class BrewPackageManager implements PackageManager {
   }
 
   async checkPackage(packageName: string): Promise<boolean> {
-    if (!(await this.check())) return false;
-    const result = await Bun.$`brew list ${packageName}`.quiet();
+    const result = await $`brew list ${packageName}`.quiet().nothrow();
     return result.exitCode === 0;
   }
 
-  supportsPackage(packageName: string): boolean {
+  async supportsPackage(packageName: string): Promise<boolean> {
     // 作为通用管理器，在 macOS/Linux 上默认支持
-    return process.platform === 'darwin' || process.platform === 'linux';
+    if (process.platform !== 'darwin' && process.platform !== 'linux') {
+      return false;
+    }
+    const result = await $`brew info ${packageName}`.quiet().nothrow();
+    return result.exitCode === 0;
   }
 
   async installPackage(packageName: string): Promise<void> {
@@ -27,20 +31,24 @@ export class BrewPackageManager implements PackageManager {
       throw new Error('Homebrew is not installed. Please install it first: https://brew.sh/');
     }
 
+    if (await this.checkPackage(packageName)) {
+      throw new Error(`Package ${packageName} already installed, skipping installation...`);
+    }
+
     console.log(`Installing ${packageName} via Homebrew...`);
-    const result = await Bun.$`brew install ${packageName}`;
+    const result = await $`brew install ${packageName}`.nothrow();
     if (result.exitCode !== 0) {
       throw new Error(`Failed to install ${packageName} via Homebrew`);
     }
   }
 
   async upgradePackage(packageName: string): Promise<void> {
-    if (!(await this.check())) {
-      throw new Error('Homebrew is not installed.');
+    if (!(await this.checkPackage(packageName))) {
+      return console.log(`Package ${packageName} not installed, skipping upgrade...`);
     }
 
     console.log(`Upgrading ${packageName} via Homebrew...`);
-    const result = await Bun.$`brew upgrade ${packageName}`;
+    const result = await $`brew upgrade ${packageName}`.nothrow();
     if (result.exitCode !== 0) {
       throw new Error(`Failed to upgrade ${packageName} via Homebrew`);
     }
@@ -52,7 +60,7 @@ export class BrewPackageManager implements PackageManager {
     }
 
     console.log(`Uninstalling ${packageName} via Homebrew...`);
-    const result = await Bun.$`brew uninstall ${packageName}`;
+    const result = await $`brew uninstall ${packageName}`;
     if (result.exitCode !== 0) {
       throw new Error(`Failed to uninstall ${packageName} via Homebrew`);
     }
