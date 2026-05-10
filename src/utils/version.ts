@@ -1,4 +1,4 @@
-import semver from "semver";
+import semver from 'semver';
 
 /**
  * 比较两个版本号。

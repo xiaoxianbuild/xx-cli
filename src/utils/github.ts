@@ -12,14 +12,14 @@ export interface GithubRelease {
 export async function getLatestRelease(owner: string, repo: string): Promise<GithubRelease> {
   const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`, {
     headers: {
-      "Accept": "application/vnd.github.v3+json",
-      "User-Agent": "xx-cli",
+      Accept: 'application/vnd.github.v3+json',
+      'User-Agent': 'xx-cli',
     },
   });
   if (!response.ok) {
     throw new Error(`Failed to fetch latest release: ${response.statusText}`);
   }
-  return await response.json() as GithubRelease;
+  return (await response.json()) as GithubRelease;
 }
 
 export async function downloadAsset(url: string): Promise<ArrayBuffer> {
