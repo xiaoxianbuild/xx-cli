@@ -1,7 +1,6 @@
 import os from 'node:os';
 import path from 'node:path';
 import fs from 'node:fs';
-import { spawnSync } from 'node:child_process';
 
 export function getHome() {
   return os.homedir();
@@ -38,13 +37,7 @@ export function readFile(file: string): string {
 }
 
 export function checkExecutableInPath(exe: string): boolean {
-  try {
-    const cmd = process.platform === 'win32' ? 'where' : 'which';
-    const result = spawnSync(cmd, [exe]);
-    return result.status === 0;
-  } catch {
-    return false;
-  }
+  return Bun.which(exe) !== null;
 }
 
 export function getBinHome(): string {

@@ -1,7 +1,6 @@
 import type { BinaryPackageProcessor } from '../types';
 import { getLatestRelease, downloadAsset } from '../../../utils/github';
 import { checkExecutableInPath, getBinHome, mustMkdir } from '../../../utils/system';
-import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -42,7 +41,7 @@ export class AsdfProcessor implements BinaryPackageProcessor {
       fs.writeFileSync(tarPath, Buffer.from(buffer));
 
       console.log('Extracting asdf...');
-      spawnSync('tar', ['-xzf', tarPath, '-C', tempDir], { stdio: 'inherit' });
+      await Bun.$`tar -xzf ${tarPath} -C ${tempDir}`.quiet();
 
       const binHome = getBinHome();
       mustMkdir(binHome);
@@ -68,10 +67,9 @@ export class AsdfProcessor implements BinaryPackageProcessor {
     console.log('Upgrading asdf to the latest version...');
     const release = await getLatestRelease(this.owner, this.repo);
 
-    const versionResult = spawnSync('asdf', ['--version'], { encoding: 'utf8' });
-    if (versionResult.status === 0) {
-      const currentVersion = versionResult.stdout.trim();
-      console.log(`Current asdf version: ${currentVersion}`);
+    const currentVersion = await Bun.$`asdf --version`.text();
+    if (currentVersion) {
+      console.log(`Current asdf version: ${currentVersion.trim()}`);
       if (currentVersion.includes(release.tag_name.replace('v', ''))) {
         console.log('asdf is already at the latest version');
         return;
@@ -97,13 +95,12 @@ export class AsdfProcessor implements BinaryPackageProcessor {
       fs.writeFileSync(tarPath, Buffer.from(buffer));
 
       console.log('Extracting asdf...');
-      spawnSync('tar', ['-xzf', tarPath, '-C', tempDir], { stdio: 'inherit' });
+      await Bun.$`tar -xzf ${tarPath} -C ${tempDir}`.quiet();
 
-      const whichResult = spawnSync('which', ['asdf'], { encoding: 'utf8' });
-      if (whichResult.status !== 0) {
+      const currentBinPath = Bun.which('asdf');
+      if (!currentBinPath) {
         throw new Error('Failed to locate current asdf binary');
       }
-      const currentBinPath = whichResult.stdout.trim();
 
       const asdfBin = path.join(tempDir, 'asdf');
       fs.copyFileSync(asdfBin, currentBinPath);

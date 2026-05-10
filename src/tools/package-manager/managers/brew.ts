@@ -1,6 +1,5 @@
 import type { PackageManager } from '../types';
 import { checkExecutableInPath } from '../../../utils/system';
-import { spawnSync } from 'node:child_process';
 
 /**
  * BrewProcessor 实现了 PackageManager 接口，通过 Homebrew 管理系统包。
@@ -14,8 +13,8 @@ export class BrewPackageManager implements PackageManager {
 
   async checkPackage(packageName: string): Promise<boolean> {
     if (!(await this.check())) return false;
-    const result = spawnSync('brew', ['list', packageName], { stdio: 'ignore' });
-    return result.status === 0;
+    const result = await Bun.$`brew list ${packageName}`.quiet();
+    return result.exitCode === 0;
   }
 
   supportsPackage(packageName: string): boolean {
@@ -29,9 +28,8 @@ export class BrewPackageManager implements PackageManager {
     }
 
     console.log(`Installing ${packageName} via Homebrew...`);
-    const result = spawnSync('brew', ['install', packageName], { stdio: 'inherit' });
-
-    if (result.status !== 0) {
+    const result = await Bun.$`brew install ${packageName}`;
+    if (result.exitCode !== 0) {
       throw new Error(`Failed to install ${packageName} via Homebrew`);
     }
   }
@@ -42,9 +40,8 @@ export class BrewPackageManager implements PackageManager {
     }
 
     console.log(`Upgrading ${packageName} via Homebrew...`);
-    const result = spawnSync('brew', ['upgrade', packageName], { stdio: 'inherit' });
-
-    if (result.status !== 0) {
+    const result = await Bun.$`brew upgrade ${packageName}`;
+    if (result.exitCode !== 0) {
       throw new Error(`Failed to upgrade ${packageName} via Homebrew`);
     }
   }
@@ -55,9 +52,8 @@ export class BrewPackageManager implements PackageManager {
     }
 
     console.log(`Uninstalling ${packageName} via Homebrew...`);
-    const result = spawnSync('brew', ['uninstall', packageName], { stdio: 'inherit' });
-
-    if (result.status !== 0) {
+    const result = await Bun.$`brew uninstall ${packageName}`;
+    if (result.exitCode !== 0) {
       throw new Error(`Failed to uninstall ${packageName} via Homebrew`);
     }
   }
