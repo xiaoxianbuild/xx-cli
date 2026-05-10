@@ -24,6 +24,8 @@ const result = await Bun.build({
     target: TARGET as Bun.Build.CompileTarget | undefined,
     outfile: OUTFILE,
   },
+  minify: true,
+  sourcemap: 'linked',
   define: {
     BUILD_VERSION: JSON.stringify(BUILD_VERSION),
     BUILD_TIME: JSON.stringify(BUILD_TIME),

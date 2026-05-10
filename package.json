@@ -6,12 +6,15 @@
     "dev": "bun src/index.ts",
     "build": "bun build src/index.ts --target=bun --outfile dist/xx",
     "compile": "bun scripts/compile.ts",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "test": "vitest run"
   },
   "private": true,
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/js-yaml": "^4.0.9"
+    "@types/js-yaml": "^4.0.9",
+    "@types/semver": "^7.7.1",
+    "vitest": "^4.1.5"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -19,6 +22,7 @@
   "dependencies": {
     "commander": "^14.0.3",
     "js-yaml": "^4.1.1",
-    "prettier": "^3.8.2"
+    "prettier": "^3.8.2",
+    "semver": "^7.8.0"
   }
 }
