@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { info } from '../tools/package-manager/manager';
 import Table from 'cli-table3';
 import type { PackageDetailInfo } from '../tools/package-manager/types';
+import { color } from '../utils/color';
 
 export function createInfoCommand() {
   return new Command('info')
@@ -55,12 +56,12 @@ function printRawInfo(info: PackageDetailInfo) {
 function printInfoTable(infos: PackageDetailInfo[]) {
   const table = new Table({
     head: [
-      '\x1b[1mManager\x1b[0m',
-      '\x1b[1mName\x1b[0m',
-      '\x1b[1mVersion\x1b[0m',
-      '\x1b[1mType\x1b[0m',
-      '\x1b[1mTags\x1b[0m',
-      '\x1b[1mDescription\x1b[0m',
+      color.bold('Manager'),
+      color.bold('Name'),
+      color.bold('Version'),
+      color.bold('Type'),
+      color.bold('Tags'),
+      color.bold('Description'),
     ],
     colWidths: [10, 25, 15, 10, 15, 45],
     wordWrap: true,
@@ -72,11 +73,11 @@ function printInfoTable(infos: PackageDetailInfo[]) {
 
   for (const info of infos) {
     table.push([
-      `\x1b[96m${info.manager}\x1b[0m`,
+      color.cyan(info.manager),
       info.name,
-      info.version ? `\x1b[33m${info.version}\x1b[0m` : '-',
+      info.version ? color.warning(info.version) : '-',
       info.type || '-',
-      info.tags ? `\x1b[90m${info.tags.join(', ')}\x1b[0m` : '-',
+      info.tags ? color.dim(info.tags.join(', ')) : '-',
       info.description || '-',
     ]);
   }

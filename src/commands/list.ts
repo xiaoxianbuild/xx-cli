@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { list } from '../tools/package-manager/manager';
 import Table from 'cli-table3';
 import type { PackageInfo, PackageListInfo } from '../tools/package-manager/types';
+import { color } from '../utils/color';
 
 export function createListCommand() {
   return new Command('list')
@@ -41,7 +42,7 @@ function printTable(results: PackageListInfo[]) {
   if (allPackages.length === 0) return;
 
   const table = new Table({
-    head: ['\x1b[1mManager\x1b[0m', '\x1b[1mName\x1b[0m', '\x1b[1mVersion\x1b[0m'],
+    head: [color.bold('Manager'), color.bold('Name'), color.bold('Version')],
     colWidths: [15, 40, 20],
     style: {
       head: [],
@@ -50,7 +51,7 @@ function printTable(results: PackageListInfo[]) {
   });
 
   for (const pkg of allPackages) {
-    table.push([`\x1b[96m${pkg.manager}\x1b[0m`, pkg.name, pkg.version ? `\x1b[33m${pkg.version}\x1b[0m` : '-']);
+    table.push([color.cyan(pkg.manager), pkg.name, pkg.version ? color.warning(pkg.version) : '-']);
   }
 
   console.log(table.toString());

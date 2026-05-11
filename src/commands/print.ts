@@ -1,4 +1,6 @@
 import { Command } from 'commander';
+import Table from 'cli-table3';
+import { color } from '../utils/color';
 
 const SEPARATOR = ':';
 
@@ -8,18 +10,39 @@ function printEnv(vars: string[], options: any) {
     process.exit(1);
   }
 
-  for (const name of vars) {
-    if (options.withName) {
-      console.log(`[${name}]`);
+  if (options.raw) {
+    for (const name of vars) {
+      if (options.withName) console.log(`[${name}]`);
+      console.log(process.env[name] || '');
     }
-    const value = process.env[name] || '';
-    if (options.raw) {
-      console.log(value);
-    } else {
-      // Split by separator and join with newline for readability
-      console.log(value.split(SEPARATOR).join('\n'));
-    }
+    return;
   }
+
+  const table = new Table({
+    head: [color.bold('Variable'), color.bold('Value')],
+    colWidths: [20, 80],
+    wordWrap: true,
+    style: { head: [], border: ['grey'] },
+  });
+
+  for (const name of vars) {
+    const value = process.env[name] || '';
+    const parts = value.split(SEPARATOR);
+    const seen = new Set<string>();
+    const displayParts = parts.map((part) => {
+      if (!part) return part;
+      if (seen.has(part)) {
+        return color.warning(part); // Highlight duplicate in yellow
+      }
+      seen.add(part);
+      return part;
+    });
+
+    const displayValue = displayParts.join('\n');
+    table.push([color.highlight(name), displayValue]);
+  }
+
+  console.log(table.toString());
 }
 
 export function createPrintCommand() {
