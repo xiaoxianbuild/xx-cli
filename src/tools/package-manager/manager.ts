@@ -1,4 +1,4 @@
-import type { PackageManager } from './types';
+import type { PackageManager, PackageListInfo, PackageDetailInfo } from './types';
 import { BinaryPackageManager } from './managers/binary';
 import { BrewPackageManager } from './managers/brew';
 import { AsdfProcessor } from './packages/asdf';
@@ -54,4 +54,28 @@ export async function uninstall(packageName: string): Promise<void> {
     }
   }
   throw new Error(`Does not support uninstall this package: ${packageName}`);
+}
+
+export async function list(): Promise<PackageListInfo[]> {
+  const results = await Promise.all(
+    managers.map(async (manager) => {
+      if (await manager.check()) {
+        return await manager.listPackages();
+      }
+      return null;
+    }),
+  );
+  return results.filter((r): r is PackageListInfo => r !== null);
+}
+
+export async function info(packageName: string): Promise<PackageDetailInfo[]> {
+  const results = await Promise.all(
+    managers.map(async (manager) => {
+      if (await manager.supportsPackage(packageName)) {
+        return await manager.infoPackage(packageName);
+      }
+      return null;
+    }),
+  );
+  return results.filter((r): r is PackageDetailInfo => r !== null);
 }

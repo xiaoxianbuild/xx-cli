@@ -59,4 +59,19 @@ describe('BrewPackageManager', () => {
       timeout: 10000,
     },
   );
+
+  it('listPackages should return a PackageListInfo object', async () => {
+    const result = await manager.listPackages();
+    expect(result.manager).toBe('brew');
+    expect(result.packages).toBeArray();
+    expect(result.packages.length).toBeGreaterThan(0);
+  });
+
+  it('infoPackage should return a PackageDetailInfo object for an existing package', async () => {
+    const result = await manager.infoPackage(existedPackage);
+    expect(result).not.toBeNull();
+    expect(result?.manager).toBe('brew');
+    expect(result?.name).toBe(existedPackage);
+    expect(result?.rawInfo).toInclude(existedPackage);
+  });
 });

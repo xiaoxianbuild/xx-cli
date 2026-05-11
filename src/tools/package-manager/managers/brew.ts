@@ -1,5 +1,5 @@
 import { $ } from 'bun';
-import type { PackageManager } from '../types';
+import type { PackageManager, PackageListInfo, PackageDetailInfo, PackageInfo } from '../types';
 import { checkExecutableInPath } from '../../../utils/system';
 
 /**
@@ -65,5 +65,39 @@ export class BrewPackageManager implements PackageManager {
     if (result.exitCode !== 0) {
       throw new Error(`Failed to uninstall ${packageName} via Homebrew`);
     }
+  }
+
+  async listPackages(): Promise<PackageListInfo> {
+    const text = await $`brew list --versions`.quiet().text();
+    const packages: PackageInfo[] = text
+      .trim()
+      .split('\n')
+      .filter((line) => line.trim() !== '')
+      .map((line) => {
+        const [name, ...versionParts] = line.trim().split(/\s+/);
+        return {
+          name: name?.trim() ?? '',
+          version: versionParts.join(' '),
+        };
+      })
+      .filter((p) => !!p.name);
+
+    return {
+      manager: this.name,
+      packages,
+    };
+  }
+
+  async infoPackage(packageName: string): Promise<PackageDetailInfo | null> {
+    const result = await $`brew info ${packageName}`.quiet().nothrow();
+    if (result.exitCode !== 0) {
+      return null;
+    }
+    const rawInfo = result.stdout.toString().trim();
+    return {
+      manager: this.name,
+      name: packageName,
+      rawInfo,
+    };
   }
 }

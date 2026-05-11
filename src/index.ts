@@ -8,6 +8,8 @@ import { createUpdateCommand } from './commands/update';
 import { createUpgradeCommand } from './commands/upgrade';
 import { createInstallCommand } from './commands/install';
 import { createUninstallCommand } from './commands/uninstall';
+import { createListCommand } from './commands/list';
+import { createInfoCommand } from './commands/info';
 
 const program = new Command();
 
@@ -21,5 +23,7 @@ program.addCommand(createUpdateCommand());
 program.addCommand(createUpgradeCommand());
 program.addCommand(createInstallCommand());
 program.addCommand(createUninstallCommand());
+program.addCommand(createListCommand());
+program.addCommand(createInfoCommand());
 
 program.parse();
