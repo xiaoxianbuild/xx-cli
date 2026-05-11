@@ -4,8 +4,8 @@ import { color } from '../utils/color';
 
 const SEPARATOR = ':';
 
-function printEnv(vars: string[], options: any) {
-  if (!options.multi && vars.length > 1) {
+function printEnv(vars: string[], options: any, isAutoListed = false) {
+  if (!options.multi && vars.length > 1 && !isAutoListed) {
     console.error('print command does not accept multiple arguments without --multi flag');
     process.exit(1);
   }
@@ -18,9 +18,17 @@ function printEnv(vars: string[], options: any) {
     return;
   }
 
+  const values = vars.map((v) => process.env[v] || '');
+  const maxKeyLen = vars.length > 0 ? Math.max(...vars.map((v) => v.length), 'Variable'.length) : 'Variable'.length;
+  // Calculate max length of value lines (after splitting by SEPARATOR)
+  const maxValueLen =
+    values.length > 0
+      ? Math.max(...values.flatMap((v) => v.split(SEPARATOR).map((p) => p.length)), 'Value'.length)
+      : 'Value'.length;
+
   const table = new Table({
     head: [color.bold('Variable'), color.bold('Value')],
-    colWidths: [20, 80],
+    colWidths: [maxKeyLen + 4, maxValueLen + 4], // Dynamic width for both columns
     wordWrap: true,
     style: { head: [], border: ['grey'] },
   });
@@ -58,8 +66,12 @@ export function createPrintCommand() {
     .option('-r, --raw', 'raw print')
     .option('-n, --with-name', 'print with name')
     .option('-m, --multi', 'print with multi variables')
-    .argument('<vars...>', 'variables to print')
-    .action(printEnv);
+    .argument('[vars...]', 'variables to print') // Make it optional
+    .action((vars: string[], options: any) => {
+      const isAutoListed = vars.length === 0;
+      const targetVars = isAutoListed ? Object.keys(process.env).sort() : vars;
+      printEnv(targetVars, options, isAutoListed);
+    });
 
   printCommand.addCommand(envCommand);
 
