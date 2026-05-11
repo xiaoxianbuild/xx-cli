@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { search } from '../tools/package-manager/manager';
 import Table from 'cli-table3';
+import type { PackageInfo, PackageListInfo } from '../tools/package-manager/types';
 
 export function createSearchCommand() {
   return new Command('search')
@@ -11,16 +12,15 @@ export function createSearchCommand() {
     .action(async (query: string, options: { raw?: boolean }) => {
       try {
         const results = await search(query);
-        for (const result of results) {
-          if (result.packages.length > 0) {
-            console.log(`\n--- ${result.manager} ---`);
-
-            if (options.raw) {
+        if (options.raw) {
+          for (const result of results) {
+            if (result.packages.length > 0) {
+              console.log(`\n--- ${result.manager} ---`);
               printRawList(result.packages);
-            } else {
-              printTable(result.packages);
             }
           }
+        } else {
+          printTable(results);
         }
       } catch (error) {
         console.error('Search failed:', (error as Error).message);
@@ -29,8 +29,8 @@ export function createSearchCommand() {
     });
 }
 
-function printRawList(packages: any[]) {
-  const groups: Record<string, any[]> = {};
+function printRawList(packages: PackageInfo[]) {
+  const groups: Record<string, PackageInfo[]> = {};
   for (const pkg of packages) {
     const type = pkg.type || 'Other';
     if (!groups[type]) groups[type] = [];
@@ -51,16 +51,21 @@ function printRawList(packages: any[]) {
   }
 }
 
-function printTable(packages: any[]) {
+function printTable(results: PackageListInfo[]) {
+  const allPackages = results.flatMap((r) => r.packages.map((pkg) => ({ ...pkg, manager: r.manager })));
+
+  if (allPackages.length === 0) return;
+
   const table = new Table({
     head: [
+      '\x1b[1mManager\x1b[0m',
       '\x1b[1mName\x1b[0m',
       '\x1b[1mVersion\x1b[0m',
       '\x1b[1mType\x1b[0m',
       '\x1b[1mTags\x1b[0m',
       '\x1b[1mDescription\x1b[0m',
     ],
-    colWidths: [30, 15, 10, 15, 50],
+    colWidths: [10, 25, 15, 10, 15, 45],
     wordWrap: true,
     style: {
       head: [], // Disable default colors to use our own
@@ -68,14 +73,15 @@ function printTable(packages: any[]) {
     },
   });
 
-  for (const pkg of packages) {
+  for (const pkg of allPackages) {
+    const managerCol = `\x1b[96m${pkg.manager}\x1b[0m`;
     const nameCol = pkg.name + (pkg.isInstalled ? ' \x1b[32m✔\x1b[0m' : '');
     const versionCol = pkg.version ? `\x1b[33m${pkg.version}\x1b[0m` : '-';
     const typeCol = pkg.type || '-';
     const tagsCol = pkg.tags ? `\x1b[90m${pkg.tags.join(', ')}\x1b[0m` : '-';
     const descCol = pkg.description || '';
 
-    table.push([nameCol, versionCol, typeCol, tagsCol, descCol]);
+    table.push([managerCol, nameCol, versionCol, typeCol, tagsCol, descCol]);
   }
 
   console.log(table.toString());
