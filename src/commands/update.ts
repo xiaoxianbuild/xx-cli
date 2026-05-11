@@ -69,6 +69,7 @@ function getExecutePath() {
 }
 
 async function getDownloadUrl(options: any) {
+  // noinspection SpellCheckingInspection
   const owner = 'xiaoxianbuild';
   const repo = 'xx-cli';
   let downloadUrl = '';
@@ -84,7 +85,7 @@ async function getDownloadUrl(options: any) {
     }
 
     console.log(`New version found: ${newVersion}, current version: ${Version}`);
-    const platform = os.platform(); // linux, darwin
+    const platform = os.platform();
     const arch = os.arch() === 'x64' ? 'amd64' : process.arch; // amd64, arm64
     const binaryName = `${CommandName}_${platform}_${arch}`;
 

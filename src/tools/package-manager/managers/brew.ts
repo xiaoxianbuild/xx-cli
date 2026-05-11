@@ -19,6 +19,7 @@ export class BrewPackageManager implements PackageManager {
 
   async supportsPackage(packageName: string): Promise<boolean> {
     // 作为通用管理器，在 macOS/Linux 上默认支持
+    // noinspection SpellCheckingInspection
     if (process.platform !== 'darwin' && process.platform !== 'linux') {
       return false;
     }

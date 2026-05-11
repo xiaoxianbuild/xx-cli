@@ -18,6 +18,7 @@ console.log(`- Target: ${TARGET || 'native'}`);
 console.log(`- Outfile: ${OUTFILE}`);
 
 // 2. 执行打包
+// noinspection SpellCheckingInspection
 const result = await Bun.build({
   entrypoints: ['./src/index.ts'],
   compile: {

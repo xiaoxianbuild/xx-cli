@@ -1,4 +1,4 @@
-import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
+import { describe, it, expect, beforeEach, afterEach } from 'bun:test';
 import { BrewPackageManager } from './brew';
 
 describe('BrewPackageManager', () => {
@@ -21,10 +21,13 @@ describe('BrewPackageManager', () => {
     expect(await manager.check()).toBe(true);
   });
 
+  // noinspection SpellCheckingInspection
   it('supportsPackage should return true on darwin or linux', async () => {
+    // noinspection SpellCheckingInspection
     Object.defineProperty(process, 'platform', { value: 'darwin', configurable: true });
     expect(await manager.supportsPackage(existedPackage)).toBe(true);
 
+    // noinspection SpellCheckingInspection
     Object.defineProperty(process, 'platform', { value: 'linux', configurable: true });
     expect(await manager.supportsPackage(existedPackage)).toBe(true);
 
