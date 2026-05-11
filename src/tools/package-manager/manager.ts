@@ -79,3 +79,15 @@ export async function info(packageName: string): Promise<PackageDetailInfo[]> {
   );
   return results.filter((r): r is PackageDetailInfo => r !== null);
 }
+
+export async function search(query: string): Promise<PackageListInfo[]> {
+  const results = await Promise.all(
+    managers.map(async (manager) => {
+      if (await manager.check()) {
+        return await manager.searchPackages(query);
+      }
+      return null;
+    }),
+  );
+  return results.filter((r): r is PackageListInfo => r !== null);
+}

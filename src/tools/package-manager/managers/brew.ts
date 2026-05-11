@@ -89,15 +89,91 @@ export class BrewPackageManager implements PackageManager {
   }
 
   async infoPackage(packageName: string): Promise<PackageDetailInfo | null> {
-    const result = await $`brew info ${packageName}`.quiet().nothrow();
-    if (result.exitCode !== 0) {
+    const infos = await this.infoPackages([packageName]);
+    if (infos.length === 0) {
       return null;
     }
-    const rawInfo = result.stdout.toString().trim();
+    return infos.find((info) => info.name === packageName) ?? null;
+  }
+
+  async infoPackages(packageNames: string[]): Promise<PackageDetailInfo[]> {
+    if (packageNames.length === 0) return [];
+
+    try {
+      const infoResult = await $`brew info --json=v2 ${packageNames}`.quiet().nothrow();
+      if (infoResult.exitCode !== 0) {
+        return packageNames.map((name) => ({ manager: this.name, name }));
+      }
+
+      const data = JSON.parse(infoResult.stdout.toString());
+      const packages: PackageDetailInfo[] = [];
+
+      // Parse Formulae
+      if (data.formulae) {
+        for (const f of data.formulae) {
+          const tags: string[] = [];
+          if (f.deprecated) tags.push('deprecated');
+          if (f.disabled) tags.push('disabled');
+
+          packages.push({
+            manager: this.name,
+            name: f.name,
+            type: 'Formula',
+            description: f.desc,
+            isInstalled: f.installed && f.installed.length > 0,
+            tags: tags.length > 0 ? tags : undefined,
+            version: f.versions?.stable,
+          });
+        }
+      }
+
+      // Parse Casks
+      if (data.casks) {
+        for (const c of data.casks) {
+          const tags: string[] = [];
+          if (c.deprecated) tags.push('deprecated');
+          if (c.disabled) tags.push('disabled');
+
+          packages.push({
+            manager: this.name,
+            name: c.token,
+            type: 'Cask',
+            description: c.desc,
+            isInstalled: !!c.installed,
+            tags: tags.length > 0 ? tags : undefined,
+            version: c.version,
+          });
+        }
+      }
+
+      return packages;
+    } catch (e) {
+      console.warn('Failed to fetch brew info:', (e as Error).message);
+      return packageNames.map((name) => ({ manager: this.name, name }));
+    }
+  }
+
+  async searchPackages(query: string): Promise<PackageListInfo> {
+    const searchResult = await $`brew search ${query}`.quiet().nothrow();
+    if (searchResult.exitCode !== 0) {
+      return { manager: this.name, packages: [] };
+    }
+
+    // Parse names from search output
+    const names = searchResult.stdout
+      .toString()
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('==> '))
+      .flatMap((line) => line.split(/\s+/))
+      .map((name) => name.replace(/✔$/, '').trim())
+      .filter((name) => !!name);
+
+    const packages = await this.infoPackages(names);
+
     return {
       manager: this.name,
-      name: packageName,
-      rawInfo,
+      packages,
     };
   }
 }

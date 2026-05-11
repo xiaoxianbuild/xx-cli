@@ -8,12 +8,17 @@ export interface PackageManager {
   uninstallPackage(packageName: string): Promise<void>;
   listPackages(): Promise<PackageListInfo>;
   infoPackage(packageName: string): Promise<PackageDetailInfo | null>;
+  infoPackages(packageNames: string[]): Promise<PackageDetailInfo[]>;
+  searchPackages(query: string): Promise<PackageListInfo>;
 }
 
 export interface PackageInfo {
   name: string;
   version?: string;
   description?: string;
+  isInstalled?: boolean;
+  tags?: string[];
+  type?: string;
 }
 
 export interface PackageListInfo {
@@ -21,11 +26,8 @@ export interface PackageListInfo {
   packages: PackageInfo[];
 }
 
-export interface PackageDetailInfo {
+export interface PackageDetailInfo extends PackageInfo {
   manager: string;
-  name: string;
-  version?: string;
-  description?: string;
   rawInfo?: string;
 }
 

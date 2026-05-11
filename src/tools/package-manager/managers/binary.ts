@@ -84,4 +84,24 @@ export class BinaryPackageManager implements PackageManager {
     }
     return null;
   }
+
+  async infoPackages(packageNames: string[]): Promise<PackageDetailInfo[]> {
+    const results: PackageDetailInfo[] = [];
+    for (const name of packageNames) {
+      const info = await this.infoPackage(name);
+      if (info) results.push(info);
+    }
+    return results;
+  }
+
+  async searchPackages(query: string): Promise<PackageListInfo> {
+    const packages: PackageInfo[] = Array.from(this.processors.keys())
+      .filter((name) => name.toLowerCase().includes(query.toLowerCase()))
+      .map((name) => ({ name }));
+
+    return {
+      manager: this.name,
+      packages,
+    };
+  }
 }
