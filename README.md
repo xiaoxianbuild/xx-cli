@@ -38,7 +38,6 @@ bun run compile
 
 The binary will be generated at `dist/xx`.
 
-
 ### Release
 
 Releases are automatically built and published via GitHub Actions when a new tag `v*` is pushed. The workflow compiles the project into single binaries for multiple platforms (Linux, macOS) using Bun's `--compile` feature.
