@@ -4,7 +4,7 @@ import { BrewPackageManager } from './managers/brew';
 import { AsdfProcessor } from './packages/asdf';
 
 // 直接在 managers 列表中包含不同的管理器实现
-const managers: PackageManager[] = [new BinaryPackageManager([new AsdfProcessor()]), new BrewPackageManager()];
+export const managers: PackageManager[] = [new BinaryPackageManager([new AsdfProcessor()]), new BrewPackageManager()];
 
 export async function install(packageName: string): Promise<void> {
   for (const manager of managers) {
